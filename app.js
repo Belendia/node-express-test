@@ -6,7 +6,7 @@ const shopRoutes = require("./routes/shop");
 
 const app = express();
 
-//middleware
+//middlewares
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use((req, res, next) => {
@@ -15,7 +15,12 @@ app.use((req, res, next) => {
 });
 
 // the route can also be registed as a middleware
-app.use(adminRoutes);
+app.use("/admin", adminRoutes);
 app.use(shopRoutes);
+
+//catch all middleware for 404
+app.use((req, res, next) => {
+  res.status(404).send("<h1>Page not found</h1>");
+});
 
 app.listen(3000);
