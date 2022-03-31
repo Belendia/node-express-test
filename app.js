@@ -3,13 +3,16 @@ const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
 
-const adminRoutes = require("./routes/admin");
+const adminData = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 
 const app = express();
 
 //middlewares
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+app.use(express.static(path.join(__dirname, "public")));
 
 app.use((req, res, next) => {
   console.log("In the middleware");
@@ -17,7 +20,7 @@ app.use((req, res, next) => {
 });
 
 // the route can also be registed as a middleware
-app.use("/admin", adminRoutes);
+app.use("/admin", adminData.routes);
 app.use(shopRoutes);
 
 //catch all middleware for 404
