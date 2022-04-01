@@ -8,6 +8,17 @@ const shopRoutes = require("./routes/shop");
 
 const app = express();
 
+// tell express that we are going to use a templating engine
+app.set("view engine", "pug");
+/**
+ * The below line5 is not necessary since the default views directory is views and
+ * I am using views to store the templates. But if I use a different
+ * name for the views folder for example, templates then I can set it for
+ * the views key like
+ * app.set('views', 'views');
+ **/
+app.set("views", "views");
+
 //middlewares
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
