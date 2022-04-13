@@ -12,7 +12,10 @@ const products = [];
 router.get("/add-product", (req, res, next) => {
   console.log("In another middleware");
   // res.sendFile(path.join(rootDir, "views", "add-product.html"));
-  res.render("add-product", { pageTitle: "Add Product" });
+  res.render("add-product", {
+    pageTitle: "Add Product",
+    path: "/admin/add-product",
+  });
 });
 
 // this route is reached using /admin/add-products POST request
