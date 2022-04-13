@@ -12,7 +12,14 @@ const app = express();
 // Tell express that we want to use handlebars as a templating engine
 // The first param can be named anything.
 // The second parameter is the function we imported above to initialize handlebars templating engine.
-app.engine("hbs", engine({ extname: "hbs", defaultLayout: false }));
+app.engine(
+  "hbs",
+  engine({
+    extname: "hbs",
+    layoutsDir: "views/layouts/",
+    defaultLayout: "main-layout",
+  })
+);
 // The second parameter that you set here should match with the first parameter
 // you set in the above code i.e. handlebars
 app.set("view engine", "hbs");

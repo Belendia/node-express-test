@@ -15,6 +15,8 @@ router.get("/", (req, res) => {
     hasProducts: products.length > 0,
     pageTitle: "Shop",
     path: "/shop",
+    activeShop: true,
+    css: ["/css/product.css"],
   }); //it use shop.pug by default;
 });
 
