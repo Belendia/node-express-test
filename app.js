@@ -4,7 +4,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 // const { engine } = require("express-handlebars");
 
-const adminData = require("./routes/admin");
+const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 
 const app = express();
@@ -50,7 +50,7 @@ app.use((req, res, next) => {
 });
 
 // the route can also be registed as a middleware
-app.use("/admin", adminData.routes);
+app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 
 //catch all middleware for 404
