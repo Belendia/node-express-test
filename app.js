@@ -2,7 +2,7 @@ const path = require("path");
 
 const express = require("express");
 const bodyParser = require("body-parser");
-const { engine } = require("express-handlebars");
+// const { engine } = require("express-handlebars");
 
 const adminData = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
@@ -12,17 +12,20 @@ const app = express();
 // Tell express that we want to use handlebars as a templating engine
 // The first param can be named anything.
 // The second parameter is the function we imported above to initialize handlebars templating engine.
-app.engine(
-  "hbs",
-  engine({
-    extname: "hbs",
-    layoutsDir: "views/layouts/",
-    defaultLayout: "main-layout",
-  })
-);
+// app.engine(
+//   "hbs",
+//   engine({
+//     extname: "hbs",
+//     layoutsDir: "views/layouts/",
+//     defaultLayout: "main-layout",
+//   })
+// );
+
+// Set ejs as a templating engine
+app.set("view engine", "ejs");
 // The second parameter that you set here should match with the first parameter
 // you set in the above code i.e. handlebars
-app.set("view engine", "hbs");
+// app.set("view engine", "hbs");
 
 // Tell express that we are going to use a templating engine
 // app.set("view engine", "pug");
