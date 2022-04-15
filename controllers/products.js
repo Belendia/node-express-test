@@ -2,7 +2,7 @@ const Product = require("../models/product");
 
 exports.getAddProduct = (req, res, next) => {
   // res.sendFile(path.join(rootDir, "views", "add-product.html"));
-  res.render("add-product", {
+  res.render("admin/add-product", {
     pageTitle: "Add Product",
     path: "/admin/add-product",
     activeAddProduct: true,
@@ -20,13 +20,14 @@ exports.postAddProduct = (req, res) => {
 
 exports.getProducts = (req, res) => {
   // res.sendFile(path.join(rootDir, "views", "shop.html"));
-  const products = Product.fetchAll();
-  res.render("shop", {
-    prods: products,
-    hasProducts: products.length > 0,
-    pageTitle: "Shop",
-    path: "/shop",
-    activeShop: true,
-    css: ["/css/product.css"],
-  }); //it use shop.pug by default;
+  Product.fetchAll((products) => {
+    res.render("shop/product-list", {
+      prods: products,
+      hasProducts: products.length > 0,
+      pageTitle: "Shop",
+      path: "/shop",
+      activeShop: true,
+      css: ["/css/product.css"],
+    }); //it use shop.pug by default;
+  });
 };
