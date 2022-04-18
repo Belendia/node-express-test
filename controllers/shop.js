@@ -12,6 +12,17 @@ exports.getProducts = (req, res) => {
   });
 };
 
+exports.getProduct = (req, res, next) => {
+  const productId = req.params.productId;
+  Product.findById(productId, (product) => {
+    res.render("shop/product-detail", {
+      pageTitle: product.title,
+      product: product,
+      path: "/products",
+    });
+  });
+};
+
 exports.getIndex = (req, res, next) => {
   // res.sendFile(path.join(rootDir, "views", "add-product.html"));
   Product.fetchAll((products) => {
@@ -35,5 +46,12 @@ exports.getCheckout = (req, res, next) => {
   res.render("shop/checkout", {
     pageTitle: "Checkout",
     path: "/checkout",
+  });
+};
+
+exports.getOrders = (req, res, next) => {
+  res.render("shop/orders", {
+    pageTitle: "Orders",
+    path: "/orders",
   });
 };

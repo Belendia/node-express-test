@@ -13,6 +13,15 @@ exports.postAddProduct = (req, res) => {
   res.redirect("/");
 };
 
+exports.postEditProduct = (req, res) => {
+  const title = req.body.title;
+  const imageURL = req.body.imageURL;
+  const price = req.body.price;
+  const description = req.body.description;
+};
+
+exports.postDeleteProduct = (req, res) => {};
+
 exports.getAddProduct = (req, res, next) => {
   // res.sendFile(path.join(rootDir, "views", "add-product.html"));
   res.render("admin/add-product", {
