@@ -34,6 +34,7 @@ module.exports = class Product {
   save() {
     getProductsFromFile((products) => {
       if (this.id) {
+        // Add new product
         const existingProductIndex = products.findIndex(
           (prod) => prod.id === this.id
         );
@@ -41,6 +42,7 @@ module.exports = class Product {
         updatedProducts[existingProductIndex] = this;
         Product.saveToFile(updatedProducts);
       } else {
+        // Edit existing product
         this.id = Math.random().toString();
         products.push(this);
         Product.saveToFile(products);
