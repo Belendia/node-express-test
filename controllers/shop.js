@@ -3,37 +3,45 @@ const Cart = require("../models/cart");
 
 exports.getProducts = (req, res) => {
   // res.sendFile(path.join(rootDir, "views", "shop.html"));
-  Product.fetchAll((products) => {
-    res.render("shop/product-list", {
-      prods: products,
-      hasProducts: products.length > 0,
-      pageTitle: "All products",
-      path: "/products",
-    }); //it use shop.pug by default;
-  });
+  Product.fetchAll()
+    .then(([rows, fieldData]) => {
+      res.render("shop/product-list", {
+        prods: rows,
+        hasProducts: rows.length > 0,
+        pageTitle: "All products",
+        path: "/products",
+      });
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 };
 
 exports.getProduct = (req, res, next) => {
   const productId = req.params.productId;
-  Product.findById(productId, (product) => {
-    res.render("shop/product-detail", {
-      pageTitle: product.title,
-      product: product,
-      path: "/products",
-    });
-  });
+  Product.findById(productId)
+    .then(([product]) => {
+      res.render("shop/product-detail", {
+        pageTitle: product[0].title,
+        product: product[0],
+        path: "/products",
+      });
+    })
+    .catch((error) => console.log(error));
 };
 
 exports.getIndex = (req, res, next) => {
   // res.sendFile(path.join(rootDir, "views", "add-product.html"));
-  Product.fetchAll((products) => {
-    res.render("shop/index", {
-      prods: products,
-      hasProducts: products.length > 0,
-      pageTitle: "Shop",
-      path: "/",
-    });
-  });
+  Product.fetchAll()
+    .then(([rows, fieldData]) => {
+      res.render("shop/index", {
+        prods: rows,
+        hasProducts: rows.length > 0,
+        pageTitle: "Shop",
+        path: "/",
+      });
+    })
+    .catch(() => {});
 };
 
 exports.getCart = (req, res, next) => {
