@@ -7,6 +7,7 @@ const bodyParser = require("body-parser");
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const errorController = require("./controllers/error");
+const db = require("./utils/db");
 
 const app = express();
 
@@ -57,4 +58,13 @@ app.use(shopRoutes);
 //catch all middleware for 404
 app.use(errorController.get404);
 
-app.listen(3000);
+// this function will look all the models that we define using sequelize
+// and creates tables and relations in the database.
+db.sync()
+  .then((result) => {
+    // console.log(result);
+    app.listen(3000);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
