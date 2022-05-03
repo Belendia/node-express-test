@@ -3,17 +3,30 @@ const Cart = require("../models/cart");
 
 exports.getProducts = (req, res) => {
   // res.sendFile(path.join(rootDir, "views", "shop.html"));
-  Product.fetchAll()
-    .then(([rows, fieldData]) => {
-      res.render("shop/product-list", {
-        prods: rows,
-        hasProducts: rows.length > 0,
-        pageTitle: "All products",
-        path: "/products",
+  // Product.fetchAll()
+  //   .then(([rows, fieldData]) => {
+  //     res.render("shop/product-list", {
+  //       prods: rows,
+  //       hasProducts: rows.length > 0,
+  //       pageTitle: "All products",
+  //       path: "/products",
+  //     });
+  //   })
+  //   .catch((error) => {
+  //     console.log(error);
+  //   });
+
+  Product.findAll()
+    .then((products) => {
+      res.render("shop/index", {
+        prods: products,
+        hasProducts: products.length > 0,
+        pageTitle: "Shop",
+        path: "/",
       });
     })
-    .catch((error) => {
-      console.log(error);
+    .catch((err) => {
+      console.log(err);
     });
 };
 
@@ -32,16 +45,18 @@ exports.getProduct = (req, res, next) => {
 
 exports.getIndex = (req, res, next) => {
   // res.sendFile(path.join(rootDir, "views", "add-product.html"));
-  Product.fetchAll()
-    .then(([rows, fieldData]) => {
+  Product.findAll()
+    .then((products) => {
       res.render("shop/index", {
-        prods: rows,
-        hasProducts: rows.length > 0,
+        prods: products,
+        hasProducts: products.length > 0,
         pageTitle: "Shop",
         path: "/",
       });
     })
-    .catch(() => {});
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 exports.getCart = (req, res, next) => {
