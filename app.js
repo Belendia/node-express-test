@@ -8,6 +8,8 @@ const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const errorController = require("./controllers/error");
 const db = require("./utils/db");
+const Product = require("./models/product");
+const User = require("./models/user");
 
 const app = express();
 
@@ -58,9 +60,16 @@ app.use(shopRoutes);
 //catch all middleware for 404
 app.use(errorController.get404);
 
-// this function will look all the models that we define using sequelize
+// Create relationship
+Product.belongsTo(User, { constraints: true, onDelete: "CASCADE" });
+// User.hasMany(Product);
+
+// The sync() function will look all the models that we define using sequelize
 // and creates tables and relations in the database.
+// { force: true } will make sure to drop the tables first before creating them. Please
+// don't use this in production settings.
 db.sync()
+  // .sync({ force: true })
   .then((result) => {
     // console.log(result);
     app.listen(3000);
