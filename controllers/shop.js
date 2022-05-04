@@ -18,7 +18,7 @@ exports.getProducts = (req, res) => {
 
   Product.findAll()
     .then((products) => {
-      res.render("shop/index", {
+      res.render("shop/product-list", {
         prods: products,
         hasProducts: products.length > 0,
         pageTitle: "Shop",
@@ -32,15 +32,31 @@ exports.getProducts = (req, res) => {
 
 exports.getProduct = (req, res, next) => {
   const productId = req.params.productId;
-  Product.findById(productId)
-    .then(([product]) => {
+
+  Product.findByPk(productId)
+    .then((product) => {
       res.render("shop/product-detail", {
-        pageTitle: product[0].title,
-        product: product[0],
+        pageTitle: product.title,
+        product: product,
         path: "/products",
       });
     })
     .catch((error) => console.log(error));
+
+  // alternatively we can use findAll with where clause
+  // Product.findAll({
+  //   where: {
+  //     id: productId,
+  //   },
+  // })
+  //   .then((product) => {
+  //     res.render("shop/product-detail", {
+  //       pageTitle: product[0].title,
+  //       product: product[0],
+  //       path: "/products",
+  //     });
+  //   })
+  //   .catch((error) => console.log(error));
 };
 
 exports.getIndex = (req, res, next) => {

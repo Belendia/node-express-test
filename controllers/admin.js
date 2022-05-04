@@ -13,7 +13,10 @@ exports.postAddProduct = (req, res) => {
     price: price,
     description: description,
   })
-    .then((result) => console.log("Created the product successfully!"))
+    .then((result) => {
+      console.log("Created the product successfully!");
+      res.redirect("/admin/products");
+    })
     .catch((err) => console.log(err));
 
   // const product = new Product(null, title, imageURL, description, price);
@@ -30,15 +33,35 @@ exports.postEditProduct = (req, res) => {
   const price = req.body.price;
   const description = req.body.description;
 
-  const product = new Product(id, title, imageURL, description, price);
-  product.save();
-  res.redirect("/admin/products");
+  // const product = new Product(id, title, imageURL, description, price);
+  // product.save();
+  Product.findByPk(id)
+    .then((product) => {
+      product.title = title;
+      product.imageURL = imageURL;
+      product.price = price;
+      product.description = description;
+
+      return product.save();
+    })
+    .then((result) => {
+      console.log("Updated Products");
+      res.redirect("/admin/products");
+    })
+    .catch((err) => console.log(err));
 };
 
 exports.postDeleteProduct = (req, res, next) => {
   const id = req.body.id;
-  Product.deleteById(id);
-  res.redirect("/admin/products");
+  Product.findByPk(id)
+    .then((product) => {
+      return product.destroy();
+    })
+    .then((result) => {
+      console.log("Destroyed the product!");
+      res.redirect("/admin/products");
+    })
+    .catch((err) => console.log(err));
 };
 
 exports.getAddProduct = (req, res, next) => {
@@ -56,7 +79,7 @@ exports.getEditProduct = (req, res, next) => {
   }
 
   const productId = req.params.productId;
-  Product.findById(productId, (product) => {
+  Product.findByPk(productId).then((product) => {
     if (!product) {
       return res.redirect("/");
     }
@@ -71,7 +94,7 @@ exports.getEditProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll((products) => {
+  Product.findAll().then((products) => {
     res.render("admin/products", {
       prods: products,
       hasProducts: products.length > 0,
