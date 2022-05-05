@@ -80,6 +80,7 @@ exports.getEditProduct = (req, res, next) => {
   }
 
   const productId = req.params.productId;
+
   Product.findByPk(productId).then((product) => {
     if (!product) {
       return res.redirect("/");
@@ -95,7 +96,7 @@ exports.getEditProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.findAll().then((products) => {
+  Product.findAll({ where: { userId: req.user.id } }).then((products) => {
     res.render("admin/products", {
       prods: products,
       hasProducts: products.length > 0,
