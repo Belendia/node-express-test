@@ -53,6 +53,19 @@ app.use((req, res, next) => {
   next(); //Allows the request to continue to the next middleware in line
 });
 
+// Register a new middleware to make the user available in the request so we can use the user anywhere.
+app.use((req, res, next) => {
+  User.findByPk(1)
+    .then((user) => {
+      req.user = user;
+      next();
+    })
+    .catch((err) => {
+      console.log(err);
+      next();
+    });
+});
+
 // the route can also be registed as a middleware
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
@@ -71,7 +84,19 @@ Product.belongsTo(User, { constraints: true, onDelete: "CASCADE" });
 db.sync()
   // .sync({ force: true })
   .then((result) => {
+    //we temporarily create a user but we first need to check if a user exists
+    return User.findByPk(1);
     // console.log(result);
+  })
+  .then((user) => {
+    // we either return a new user by first creating it or the user we fetched in the first then block above
+    if (!user) {
+      return User.create({ name: "Belendia", email: "test@gmail.com" });
+    }
+    return user; // if you return anything in the then block, it will be wrapped into promise
+  })
+  .then((user) => {
+    // console.log(user);
     app.listen(3000);
   })
   .catch((err) => {
