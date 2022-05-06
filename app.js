@@ -12,6 +12,8 @@ const Product = require("./models/product");
 const User = require("./models/user");
 const Cart = require("./models/cart");
 const CartItem = require("./models/cart-item");
+const Order = require("./models/order");
+const OrderItem = require("./models/order-item");
 
 const app = express();
 
@@ -82,6 +84,10 @@ User.hasOne(Cart);
 Cart.belongsTo(User);
 Cart.belongsToMany(Product, { through: CartItem });
 Product.belongsToMany(Cart, { through: CartItem });
+Order.belongsTo(User);
+User.hasMany(Order);
+Order.belongsToMany(Product, { through: OrderItem });
+Product.belongsToMany(Order, { through: OrderItem });
 
 // The sync() function will look all the models that we define using sequelize
 // and creates tables and relations in the database.
@@ -102,13 +108,16 @@ db.sync()
     return user; // if you return anything in the then block, it will be wrapped into promise
   })
   .then((user) => {
-    // console.log(user);
-    // create a cart for this user;
-    const cart = user.getCart();
-    if (!cart) {
-      return user.createCart();
-    }
-    return cart;
+    // create user cart;
+    return user
+      .getCart()
+      .then((cart) => {
+        if (!cart) {
+          return user.createCart();
+        }
+        return cart;
+      })
+      .catch((err) => console.log(err));
   })
   .then((cart) => {
     // after creating a user and cart, finally listen.
