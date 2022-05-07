@@ -3,17 +3,9 @@ const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
 // const { engine } = require("express-handlebars");
+const mongoConnect = require("./utils/db");
 
-const adminRoutes = require("./routes/admin");
-const shopRoutes = require("./routes/shop");
 const errorController = require("./controllers/error");
-const db = require("./utils/db");
-const Product = require("./models/product");
-const User = require("./models/user");
-const Cart = require("./models/cart");
-const CartItem = require("./models/cart-item");
-const Order = require("./models/order");
-const OrderItem = require("./models/order-item");
 
 const app = express();
 
@@ -57,72 +49,26 @@ app.use((req, res, next) => {
   next(); //Allows the request to continue to the next middleware in line
 });
 
-// Register a new middleware to make the user available in the request so we can use the user anywhere.
 app.use((req, res, next) => {
-  User.findByPk(1)
-    .then((user) => {
-      req.user = user;
-      next();
-    })
-    .catch((err) => {
-      console.log(err);
-      next();
-    });
+  // User.findByPk(1)
+  //   .then((user) => {
+  //     req.user = user;
+  //     next();
+  //   })
+  //   .catch((err) => {
+  //     console.log(err);
+  //     next();
+  //   });
 });
 
 // the route can also be registed as a middleware
-app.use("/admin", adminRoutes);
-app.use(shopRoutes);
+// app.use("/admin", adminRoutes);
+// app.use(shopRoutes);
 
 //catch all middleware for 404
 app.use(errorController.get404);
 
-// Create relationship
-Product.belongsTo(User, { constraints: true, onDelete: "CASCADE" });
-User.hasMany(Product);
-User.hasOne(Cart);
-Cart.belongsTo(User);
-Cart.belongsToMany(Product, { through: CartItem });
-Product.belongsToMany(Cart, { through: CartItem });
-Order.belongsTo(User);
-User.hasMany(Order);
-Order.belongsToMany(Product, { through: OrderItem });
-Product.belongsToMany(Order, { through: OrderItem });
-
-// The sync() function will look all the models that we define using sequelize
-// and creates tables and relations in the database.
-// { force: true } will make sure to drop the tables first before creating them. Please
-// don't use this in production settings.
-db.sync()
-  // .sync({ force: true })
-  .then((result) => {
-    //we temporarily create a user but we first need to check if a user exists
-    return User.findByPk(1);
-    // console.log(result);
-  })
-  .then((user) => {
-    // we either return a new user by first creating it or the user we fetched in the first then block above
-    if (!user) {
-      return User.create({ name: "Belendia", email: "test@gmail.com" });
-    }
-    return user; // if you return anything in the then block, it will be wrapped into promise
-  })
-  .then((user) => {
-    // create user cart;
-    return user
-      .getCart()
-      .then((cart) => {
-        if (!cart) {
-          return user.createCart();
-        }
-        return cart;
-      })
-      .catch((err) => console.log(err));
-  })
-  .then((cart) => {
-    // after creating a user and cart, finally listen.
-    app.listen(3000);
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+mongoConnect((client) => {
+  console.log(client);
+  app.listen(3000);
+});
