@@ -3,7 +3,8 @@ const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
 // const { engine } = require("express-handlebars");
-const mongoConnect = require("./utils/db");
+const mongoConnect = require("./utils/db").mongoConnect;
+const adminRoutes = require("./routes/admin");
 
 const errorController = require("./controllers/error");
 
@@ -59,16 +60,16 @@ app.use((req, res, next) => {
   //     console.log(err);
   //     next();
   //   });
+  next();
 });
 
 // the route can also be registed as a middleware
-// app.use("/admin", adminRoutes);
+app.use("/admin", adminRoutes);
 // app.use(shopRoutes);
 
 //catch all middleware for 404
 app.use(errorController.get404);
 
-mongoConnect((client) => {
-  console.log(client);
+mongoConnect(() => {
   app.listen(3000);
 });
