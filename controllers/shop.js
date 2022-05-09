@@ -31,19 +31,19 @@ exports.getIndex = (req, res, next) => {
     });
 };
 
-// exports.getProduct = (req, res, next) => {
-//   const productId = req.params.productId;
+exports.getProduct = (req, res, next) => {
+  const productId = req.params.productId;
 
-//   Product.findByPk(productId)
-//     .then((product) => {
-//       res.render("shop/product-detail", {
-//         pageTitle: product.title,
-//         product: product,
-//         path: "/products",
-//       });
-//     })
-//     .catch((error) => console.log(error));
-// };
+  Product.findById(productId)
+    .then((product) => {
+      res.render("shop/product-detail", {
+        pageTitle: product.title,
+        product: product,
+        path: "/products",
+      });
+    })
+    .catch((error) => console.log(error));
+};
 
 // exports.getCart = (req, res, next) => {
 //   console.log(req.user.cart);
