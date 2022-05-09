@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 // const { engine } = require("express-handlebars");
 const mongoConnect = require("./utils/db").mongoConnect;
 const adminRoutes = require("./routes/admin");
+const shopRoutes = require("./routes/shop");
 
 const errorController = require("./controllers/error");
 
@@ -65,7 +66,7 @@ app.use((req, res, next) => {
 
 // the route can also be registed as a middleware
 app.use("/admin", adminRoutes);
-// app.use(shopRoutes);
+app.use(shopRoutes);
 
 //catch all middleware for 404
 app.use(errorController.get404);

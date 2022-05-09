@@ -18,6 +18,20 @@ class Product {
       })
       .catch((err) => console.log(err));
   }
+
+  static fetchAll() {
+    // Don't use toArray for large dataset.
+    const db = getDb();
+    return db
+      .collection("products")
+      .find()
+      .toArray()
+      .then((products) => {
+        console.log(products);
+        return products;
+      })
+      .catch((err) => console.log(err));
+  }
 }
 
 module.exports = Product;

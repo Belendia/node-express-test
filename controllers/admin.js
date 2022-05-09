@@ -25,6 +25,17 @@ exports.getAddProduct = (req, res, next) => {
   });
 };
 
+// exports.getProducts = (req, res, next) => {
+//   Product.findAll({ where: { userId: req.user.id } }).then((products) => {
+//     res.render("admin/products", {
+//       prods: products,
+//       hasProducts: products.length > 0,
+//       pageTitle: "Admin products",
+//       path: "/admin/products",
+//     }); //it use shop.pug by default;
+//   });
+// };
+
 // exports.postEditProduct = (req, res) => {
 //   const id = req.body.id;
 //   const title = req.body.title;
@@ -82,16 +93,5 @@ exports.getAddProduct = (req, res, next) => {
 //       editing: editMode,
 //       product: product,
 //     });
-//   });
-// };
-
-// exports.getProducts = (req, res, next) => {
-//   Product.findAll({ where: { userId: req.user.id } }).then((products) => {
-//     res.render("admin/products", {
-//       prods: products,
-//       hasProducts: products.length > 0,
-//       pageTitle: "Admin products",
-//       path: "/admin/products",
-//     }); //it use shop.pug by default;
 //   });
 // };
