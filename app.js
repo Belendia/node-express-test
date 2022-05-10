@@ -7,7 +7,7 @@ const mongoConnect = require("./utils/db").mongoConnect;
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 
-const user = require("./models/user");
+const User = require("./models/user");
 
 const errorController = require("./controllers/error");
 
@@ -54,7 +54,7 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-  User.findByPk("6279e81c377007ead474094d")
+  User.findById("6279e81c377007ead474094d")
     .then((user) => {
       req.user = user;
       next();
@@ -63,7 +63,6 @@ app.use((req, res, next) => {
       console.log(err);
       next();
     });
-  next();
 });
 
 // the route can also be registed as a middleware
