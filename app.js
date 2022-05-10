@@ -7,6 +7,8 @@ const mongoConnect = require("./utils/db").mongoConnect;
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 
+const user = require("./models/user");
+
 const errorController = require("./controllers/error");
 
 const app = express();
@@ -52,15 +54,15 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-  // User.findByPk(1)
-  //   .then((user) => {
-  //     req.user = user;
-  //     next();
-  //   })
-  //   .catch((err) => {
-  //     console.log(err);
-  //     next();
-  //   });
+  User.findByPk("6279e81c377007ead474094d")
+    .then((user) => {
+      req.user = user;
+      next();
+    })
+    .catch((err) => {
+      console.log(err);
+      next();
+    });
   next();
 });
 
