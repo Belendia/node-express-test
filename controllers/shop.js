@@ -79,18 +79,18 @@ exports.postCartDeleteProduct = (req, res, next) => {
     .catch((err) => console.log(err));
 };
 
-// exports.getOrders = (req, res, next) => {
-//   req.user
-//     .getOrders({ include: ["products"] }) //eager loading
-//     .then((orders) => {
-//       res.render("shop/orders", {
-//         pageTitle: "Orders",
-//         path: "/orders",
-//         orders: orders,
-//       });
-//     })
-//     .catch((err) => console.log(err));
-// };
+exports.getOrders = (req, res, next) => {
+  req.user
+    .getOrders() //eager loading
+    .then((orders) => {
+      res.render("shop/orders", {
+        pageTitle: "Orders",
+        path: "/orders",
+        orders: orders,
+      });
+    })
+    .catch((err) => console.log(err));
+};
 
 exports.postOrders = (req, res, next) => {
   req.user
