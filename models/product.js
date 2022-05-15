@@ -1,58 +1,103 @@
-// const db = require("../utils/db");
+const mongoose = require("mongoose");
 
-// const Cart = require("./cart");
+const Schema = mongoose.Schema;
 
-// module.exports = class Product {
-//   constructor(id, title, imageURL, description, price) {
-//     this.id = id;
+const productSchema = new Schema({
+  title: {
+    type: String,
+    required: true,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  imageURL: {
+    type: String,
+    required: true,
+  },
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+});
+
+module.exports = mongoose.model("Product", productSchema);
+
+// const mongodb = require("mongodb");
+// const getDb = require("../utils/db").getDb;
+
+// class Product {
+//   constructor(title, price, description, imageURL, id, userId) {
 //     this.title = title;
-//     this.imageURL = imageURL;
-//     this.description = description;
 //     this.price = price;
+//     this.description = description;
+//     this.imageURL = imageURL;
+//     this._id = id ? new mongodb.ObjectId(id) : null;
+//     this.userId = userId;
 //   }
 
 //   save() {
-//     return db.execute(
-//       "INSERT INTO product (title, price, imageURL, description) VALUES (?, ?, ?, ?)",
-//       [this.title, this.price, this.imageURL, this.description]
-//     );
-//   }
+//     const db = getDb();
+//     let dbOp;
+//     if (this._id) {
+//       // Update the product
+//       dbOp = db
+//         .collection("products")
+//         .updateOne({ _id: this._id }, { $set: this });
+//     } else {
+//       // Create new product
+//       dbOp = db.collection("products").insertOne(this);
+//     }
 
-//   static deleteById(id) {}
+//     return dbOp
+//       .then((result) => {
+//         console.log(result);
+//       })
+//       .catch((err) => console.log(err));
+//   }
 
 //   static fetchAll() {
-//     return db.execute(`SELECT * FROM product`);
+//     // Don't use toArray for large dataset.
+//     const db = getDb();
+//     return db
+//       .collection("products")
+//       .find()
+//       .toArray()
+//       .then((products) => {
+//         console.log(products);
+//         return products;
+//       })
+//       .catch((err) => console.log(err));
 //   }
 
-//   static findById(id) {
-//     return db.execute(`SELECT * FROM product WHERE id = ?`, [id]);
+//   static findById(productId) {
+//     const db = getDb();
+//     return db
+//       .collection("products")
+//       .find({ _id: new mongodb.ObjectId(productId) })
+//       .next()
+//       .then((product) => {
+//         console.log(product);
+//         return product;
+//       })
+//       .catch((err) => console.log(err));
 //   }
-// };
 
-const Sequelize = require("sequelize");
+//   static deleteById(productId) {
+//     const db = getDb();
+//     return db
+//       .collection("products")
+//       .deleteOne({ _id: new mongodb.ObjectId(productId) })
+//       .then((result) => {
+//         console.log("Deleted");
+//       })
+//       .catch((err) => console.log(err));
+//   }
+// }
 
-const db = require("../utils/db");
-
-const Product = db.define("product", {
-  id: {
-    type: Sequelize.INTEGER,
-    autoIncrement: true,
-    allowNull: false,
-    primaryKey: true,
-  },
-  title: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  price: {
-    type: Sequelize.DOUBLE,
-    allowNull: false,
-  },
-  imageURL: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  description: Sequelize.STRING,
-});
-
-module.exports = Product;
+// module.exports = Product;

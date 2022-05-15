@@ -7,59 +7,17 @@ exports.postAddProduct = (req, res) => {
   const price = req.body.price;
   const description = req.body.description;
 
-  Product.create({
+  const product = new Product({
     title: title,
-    imageURL: imageURL,
     price: price,
     description: description,
-    userId: req.user.id,
-  })
+    imageURL: imageURL,
+    userId: req.user,
+  });
+  product
+    .save()
     .then((result) => {
       console.log("Created the product successfully!");
-      res.redirect("/admin/products");
-    })
-    .catch((err) => console.log(err));
-
-  // const product = new Product(null, title, imageURL, description, price);
-  // product
-  //   .save()
-  //   .then(() => res.redirect("/"))
-  //   .catch((error) => console.log(error));
-};
-
-exports.postEditProduct = (req, res) => {
-  const id = req.body.id;
-  const title = req.body.title;
-  const imageURL = req.body.imageURL;
-  const price = req.body.price;
-  const description = req.body.description;
-
-  // const product = new Product(id, title, imageURL, description, price);
-  // product.save();
-  Product.findByPk(id)
-    .then((product) => {
-      product.title = title;
-      product.imageURL = imageURL;
-      product.price = price;
-      product.description = description;
-
-      return product.save();
-    })
-    .then((result) => {
-      console.log("Updated Products");
-      res.redirect("/admin/products");
-    })
-    .catch((err) => console.log(err));
-};
-
-exports.postDeleteProduct = (req, res, next) => {
-  const id = req.body.id;
-  Product.findByPk(id)
-    .then((product) => {
-      return product.destroy();
-    })
-    .then((result) => {
-      console.log("Destroyed the product!");
       res.redirect("/admin/products");
     })
     .catch((err) => console.log(err));
@@ -73,6 +31,22 @@ exports.getAddProduct = (req, res, next) => {
   });
 };
 
+exports.getProducts = (req, res, next) => {
+  //.populate() function is used to load a related data i.e. all users who created a product
+  // .select() function is used to select specific fields. 'title price -_id' will select title and price and excludes id (- is exclude)
+  Product.find()
+    // .select("title price -_id")
+    // .populate("userId", "name")
+    .then((products) => {
+      res.render("admin/products", {
+        prods: products,
+        hasProducts: products.length > 0,
+        pageTitle: "Admin products",
+        path: "/admin/products",
+      }); //it use shop.pug by default;
+    });
+};
+
 exports.getEditProduct = (req, res, next) => {
   const editMode = req.query.edit;
   if (!editMode) {
@@ -81,7 +55,7 @@ exports.getEditProduct = (req, res, next) => {
 
   const productId = req.params.productId;
 
-  Product.findByPk(productId).then((product) => {
+  Product.findById(productId).then((product) => {
     if (!product) {
       return res.redirect("/");
     }
@@ -95,13 +69,34 @@ exports.getEditProduct = (req, res, next) => {
   });
 };
 
-exports.getProducts = (req, res, next) => {
-  Product.findAll({ where: { userId: req.user.id } }).then((products) => {
-    res.render("admin/products", {
-      prods: products,
-      hasProducts: products.length > 0,
-      pageTitle: "Admin products",
-      path: "/admin/products",
-    }); //it use shop.pug by default;
-  });
+exports.postEditProduct = (req, res) => {
+  const id = req.body.id;
+  const title = req.body.title;
+  const imageURL = req.body.imageURL;
+  const price = req.body.price;
+  const description = req.body.description;
+
+  Product.findById(id)
+    .then((product) => {
+      product.title = title;
+      product.price = price;
+      product.description = description;
+      product.imageURL = imageURL;
+      return product.save();
+    })
+    .then((result) => {
+      console.log("Updated Products");
+      res.redirect("/admin/products");
+    })
+    .catch((err) => console.log(err));
+};
+
+exports.postDeleteProduct = (req, res, next) => {
+  const id = req.body.id;
+  Product.findByIdAndRemove(id)
+    .then((result) => {
+      console.log("Destroyed the product!");
+      res.redirect("/admin/products");
+    })
+    .catch((err) => console.log(err));
 };
