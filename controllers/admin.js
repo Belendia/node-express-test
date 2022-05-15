@@ -31,8 +31,7 @@ exports.getAddProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  //{ where: { userId: req.user.id } }
-  Product.fetchAll().then((products) => {
+  Product.find().then((products) => {
     res.render("admin/products", {
       prods: products,
       hasProducts: products.length > 0,
@@ -71,10 +70,14 @@ exports.postEditProduct = (req, res) => {
   const price = req.body.price;
   const description = req.body.description;
 
-  const product = new Product(title, price, description, imageURL, id);
-
-  product
-    .save()
+  Product.findById(id)
+    .then((product) => {
+      product.title = title;
+      product.price = price;
+      product.description = description;
+      product.imageURL = imageURL;
+      return product.save();
+    })
     .then((result) => {
       console.log("Updated Products");
       res.redirect("/admin/products");
