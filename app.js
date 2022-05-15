@@ -8,7 +8,7 @@ const mongoose = require("mongoose");
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 
-// const User = require("./models/user");
+const User = require("./models/user");
 
 const errorController = require("./controllers/error");
 
@@ -54,17 +54,17 @@ app.use((req, res, next) => {
   next(); //Allows the request to continue to the next middleware in line
 });
 
-// app.use((req, res, next) => {
-//   User.findById("6279e81c377007ead474094d")
-//     .then((user) => {
-//       req.user = new User(user.name, user.email, user.cart, user._id);
-//       next();
-//     })
-//     .catch((err) => {
-//       console.log(err);
-//       next();
-//     });
-// });
+app.use((req, res, next) => {
+  User.findById("6280a04649460150af7175f4")
+    .then((user) => {
+      req.user = user;
+      next();
+    })
+    .catch((err) => {
+      console.log(err);
+      next();
+    });
+});
 
 // the route can also be registed as a middleware
 app.use("/admin", adminRoutes);
@@ -75,6 +75,21 @@ app.use(errorController.get404);
 
 mongoose
   .connect("mongodb://localhost:27017/shopping")
+  .then((result) => {
+    User.findOne().then((user) => {
+      if (!user) {
+        const user = new User({
+          name: "Belendia",
+          email: "test@gmail.com",
+          cart: {
+            items: [],
+          },
+        });
+        return user.save();
+      }
+      return user;
+    });
+  })
   .then((result) => {
     app.listen(3000);
   })
