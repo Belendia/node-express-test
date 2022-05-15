@@ -32,14 +32,19 @@ exports.getAddProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.find().then((products) => {
-    res.render("admin/products", {
-      prods: products,
-      hasProducts: products.length > 0,
-      pageTitle: "Admin products",
-      path: "/admin/products",
-    }); //it use shop.pug by default;
-  });
+  //.populate() function is used to load a related data i.e. all users who created a product
+  // .select() function is used to select specific fields. 'title price -_id' will select title and price and excludes id (- is exclude)
+  Product.find()
+    // .select("title price -_id")
+    // .populate("userId", "name")
+    .then((products) => {
+      res.render("admin/products", {
+        prods: products,
+        hasProducts: products.length > 0,
+        pageTitle: "Admin products",
+        path: "/admin/products",
+      }); //it use shop.pug by default;
+    });
 };
 
 exports.getEditProduct = (req, res, next) => {
