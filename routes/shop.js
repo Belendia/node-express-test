@@ -1,7 +1,6 @@
 const express = require("express");
 
 const shopController = require("../controllers/shop");
-const { route } = require("./admin");
 
 const router = express.Router();
 
