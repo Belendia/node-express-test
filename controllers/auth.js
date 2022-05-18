@@ -1,3 +1,4 @@
+const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 
 exports.getLogin = (req, res, next) => {
@@ -12,22 +13,36 @@ exports.postLogin = (req, res, next) => {
   // this is used for setting a cookie
   // req.setHeader("Set-Cookie", "loggedIn=true");
 
-  // session
-  User.findById("6280cff33a57280da29738e4")
-    .then((user) => {
-      req.session.user = user;
-      req.session.isLoggedIn = true;
-      // res.redirect("/");
+  const email = req.body.email;
+  const password = req.body.password;
 
-      // We don't usually need to explicitly call save() method
-      // but we wanted to make sure that we are redirecting after
-      // the session is stored to the mongodb database which will
-      // take few milliseconds. Some times the redirect will occure
-      // before the session is stored.
-      req.session.save((err) => {
-        console.log(err);
-        res.redirect("/");
-      });
+  User.findOne({ email: email })
+    .then((user) => {
+      // if we can't find the user by email, redirect to login page
+      if (!user) {
+        return res.redirect("/login");
+      }
+      bcrypt
+        .compare(password, user.password)
+        .then((passwordMatch) => {
+          if (passwordMatch) {
+            req.session.user = user;
+            req.session.isLoggedIn = true;
+            // res.redirect("/");
+
+            // We don't usually need to explicitly call save() method
+            // but we wanted to make sure that we are redirecting after
+            // the session is stored to the mongodb database which will
+            // take few milliseconds. Some times the redirect will occure
+            // before the session is stored.
+            return req.session.save((err) => {
+              console.log(err);
+              res.redirect("/");
+            });
+          }
+          res.redirect("/login");
+        })
+        .catch((err) => console.log(err));
     })
     .catch((err) => {
       console.log(err);
@@ -62,16 +77,21 @@ exports.postSignup = (req, res, next) => {
         return res.redirect("/signup");
       }
 
-      const user = new User({
-        email: email,
-        password: password,
-        cart: { items: [] },
-      });
-      return user.save();
-    })
-    .then((result) => {
-      // after successfully creating the user, redirect to login page to authenticate the user
-      res.redirect("/login");
+      // hash the password before storing it
+      return bcrypt
+        .hash(password, 12)
+        .then((hashedPassword) => {
+          const user = new User({
+            email: email,
+            password: hashedPassword,
+            cart: { items: [] },
+          });
+          return user.save();
+        })
+        .then((result) => {
+          // after successfully creating the user, redirect to login page to authenticate the user
+          res.redirect("/login");
+        });
     })
     .catch((err) => console.log(err));
 };
