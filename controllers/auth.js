@@ -40,3 +40,38 @@ exports.postLogout = (req, res, next) => {
     res.redirect("/");
   });
 };
+
+exports.getSignup = (req, res, next) => {
+  res.render("auth/signup", {
+    path: "/signup",
+    pageTitle: "Signup",
+    isAuthenticated: false,
+  });
+};
+
+exports.postSignup = (req, res, next) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  const confirmPassword = req.body.confirmPassword;
+
+  User.findOne({ email: email })
+    .then((usr) => {
+      if (usr) {
+        // TODO: show error message to the user that the
+        // email address alredy exists.
+        return res.redirect("/signup");
+      }
+
+      const user = new User({
+        email: email,
+        password: password,
+        cart: { items: [] },
+      });
+      return user.save();
+    })
+    .then((result) => {
+      // after successfully creating the user, redirect to login page to authenticate the user
+      res.redirect("/login");
+    })
+    .catch((err) => console.log(err));
+};
