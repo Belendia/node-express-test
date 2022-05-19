@@ -2,9 +2,20 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 
 exports.getLogin = (req, res, next) => {
+  // 'error' is the key we used down in postLogin function line 24
+  // The error message is stored in the session and will be removed once it is shown.
+  let message = req.flash("error");
+  if (message.length > 0) {
+    message = message[0];
+  } else {
+    message = null;
+  }
+
   return res.render("auth/login", {
     pageTitle: "Login",
     path: "/login",
+
+    errorMessage: message,
   });
 };
 
@@ -19,6 +30,7 @@ exports.postLogin = (req, res, next) => {
     .then((user) => {
       // if we can't find the user by email, redirect to login page
       if (!user) {
+        req.flash("error", "Invalid email or password.");
         return res.redirect("/login");
       }
       bcrypt
@@ -39,6 +51,9 @@ exports.postLogin = (req, res, next) => {
               res.redirect("/");
             });
           }
+
+          // valid email but wrong password
+          req.flash("error", "Invalid email or password.");
           res.redirect("/login");
         })
         .catch((err) => console.log(err));
@@ -56,9 +71,17 @@ exports.postLogout = (req, res, next) => {
 };
 
 exports.getSignup = (req, res, next) => {
+  let message = req.flash("error");
+  if (message.length > 0) {
+    message = message[0];
+  } else {
+    message = null;
+  }
+
   res.render("auth/signup", {
     path: "/signup",
     pageTitle: "Signup",
+    errorMessage: message,
   });
 };
 
@@ -72,6 +95,10 @@ exports.postSignup = (req, res, next) => {
       if (usr) {
         // TODO: show error message to the user that the
         // email address alredy exists.
+        req.flash(
+          "error",
+          "E-mail exists already, please pick a different one."
+        );
         return res.redirect("/signup");
       }
 
