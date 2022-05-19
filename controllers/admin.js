@@ -28,7 +28,6 @@ exports.getAddProduct = (req, res, next) => {
     pageTitle: "Add Product",
     path: "/admin/add-product",
     editing: false,
-    isAuthenticated: req.session.isLoggedIn === true,
   });
 };
 
@@ -44,7 +43,6 @@ exports.getProducts = (req, res, next) => {
         hasProducts: products.length > 0,
         pageTitle: "Admin products",
         path: "/admin/products",
-        isAuthenticated: req.session.isLoggedIn === true,
       }); //it use shop.pug by default;
     });
 };
@@ -67,7 +65,6 @@ exports.getEditProduct = (req, res, next) => {
       path: "/admin/edit-product",
       editing: editMode,
       product: product,
-      isAuthenticated: req.session.isLoggedIn === true,
     });
   });
 };
