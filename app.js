@@ -9,6 +9,8 @@ const MongoDbStore = require("connect-mongodb-session")(session);
 const csrf = require("csurf");
 // used to show flash messages to the user
 const flash = require("connect-flash");
+// read .env file and make the entries available in process.env global variables.
+require("dotenv").config();
 
 // const { engine } = require("express-handlebars");
 

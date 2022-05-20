@@ -1,5 +1,13 @@
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
+const nodemailer = require("nodemailer");
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.SENDER_EMAIL,
+    pass: process.env.SENDER_PASSWORD,
+  },
+});
 
 exports.getLogin = (req, res, next) => {
   // 'error' is the key we used down in postLogin function line 24
@@ -116,6 +124,13 @@ exports.postSignup = (req, res, next) => {
         .then((result) => {
           // after successfully creating the user, redirect to login page to authenticate the user
           res.redirect("/login");
+
+          return transporter.sendMail({
+            from: "pomi144@gmail.com",
+            to: email,
+            subject: "Signup succeeded!",
+            html: "<h1>You successfully signed up!</h1>",
+          });
         });
     })
     .catch((err) => console.log(err));
