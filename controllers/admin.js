@@ -34,7 +34,7 @@ exports.getAddProduct = (req, res, next) => {
 exports.getProducts = (req, res, next) => {
   //.populate() function is used to load a related data i.e. all users who created a product
   // .select() function is used to select specific fields. 'title price -_id' will select title and price and excludes id (- is exclude)
-  Product.find()
+  Product.find({ userId: req.user._id })
     // .select("title price -_id")
     // .populate("userId", "name")
     .then((products) => {
@@ -78,22 +78,24 @@ exports.postEditProduct = (req, res) => {
 
   Product.findById(id)
     .then((product) => {
+      if (product.userId.toString() !== req.user._id.toString()) {
+        return res.redirect("/");
+      }
       product.title = title;
       product.price = price;
       product.description = description;
       product.imageURL = imageURL;
-      return product.save();
-    })
-    .then((result) => {
-      console.log("Updated Products");
-      res.redirect("/admin/products");
+      return product.save().then((result) => {
+        console.log("Updated Products");
+        res.redirect("/admin/products");
+      });
     })
     .catch((err) => console.log(err));
 };
 
 exports.postDeleteProduct = (req, res, next) => {
   const id = req.body.id;
-  Product.findByIdAndRemove(id)
+  Product.deleteOne({ _id: id, userId: req.user._id })
     .then((result) => {
       console.log("Destroyed the product!");
       res.redirect("/admin/products");
