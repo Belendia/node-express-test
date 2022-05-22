@@ -8,7 +8,19 @@ const User = require("../models/user");
 const router = express.Router();
 
 router.get("/login", authController.getLogin);
-router.post("/login", authController.postLogin);
+router.post(
+  "/login",
+  [
+    body("email").isEmail().withMessage("Please enter a valid e-mail."),
+    body(
+      "password",
+      "Password must be at lease 6 characters long and use alpha numeric characters."
+    )
+      .isLength({ min: 6 })
+      .isAlphanumeric(),
+  ],
+  authController.postLogin
+);
 router.post("/logout", isAuth, authController.postLogout);
 router.get("/signup", authController.getSignup);
 
