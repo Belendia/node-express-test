@@ -3,6 +3,7 @@ const { check, body } = require("express-validator/check");
 
 const authController = require("../controllers/auth");
 const isAuth = require("../middleware/is-auth");
+const User = require("../models/user");
 
 const router = express.Router();
 
@@ -21,10 +22,15 @@ router.post(
       .isEmail()
       .withMessage("Please enter a valid e-mail.")
       .custom((value, { req }) => {
-        if (value === "test@test.com") {
-          throw new Error("This email address is forbidden");
-        }
-        return true;
+        // The custom validator returns true if the promiss resolves successfully.
+        // If not, it will return false.
+        return User.findOne({ email: value }).then((usr) => {
+          if (usr) {
+            return Promise.reject(
+              "E-mail exists already, please pick a different one."
+            );
+          }
+        });
       }),
     // We add the error message to the body as a second argument because it serves both/all validator functions.
     // withMessage() function however will only display an error message for only one validator function. i.e. isLength ...

@@ -112,40 +112,27 @@ exports.postSignup = (req, res, next) => {
     });
   }
 
-  User.findOne({ email: email })
-    .then((usr) => {
-      if (usr) {
-        // TODO: show error message to the user that the
-        // email address alredy exists.
-        req.flash(
-          "error",
-          "E-mail exists already, please pick a different one."
-        );
-        return res.redirect("/signup");
-      }
+  // hash the password before storing it
+  bcrypt
+    .hash(password, 12)
+    .then((hashedPassword) => {
+      const user = new User({
+        email: email,
+        password: hashedPassword,
+        cart: { items: [] },
+      });
+      return user.save();
+    })
+    .then((result) => {
+      // after successfully creating the user, redirect to login page to authenticate the user
+      res.redirect("/login");
 
-      // hash the password before storing it
-      return bcrypt
-        .hash(password, 12)
-        .then((hashedPassword) => {
-          const user = new User({
-            email: email,
-            password: hashedPassword,
-            cart: { items: [] },
-          });
-          return user.save();
-        })
-        .then((result) => {
-          // after successfully creating the user, redirect to login page to authenticate the user
-          res.redirect("/login");
-
-          return transporter.sendMail({
-            from: "pomi144@gmail.com",
-            to: email,
-            subject: "Signup succeeded!",
-            html: "<h1>You successfully signed up!</h1>",
-          });
-        });
+      return transporter.sendMail({
+        from: "pomi144@gmail.com",
+        to: email,
+        subject: "Signup succeeded!",
+        html: "<h1>You successfully signed up!</h1>",
+      });
     })
     .catch((err) => console.log(err));
 };
