@@ -11,13 +11,17 @@ router.get("/login", authController.getLogin);
 router.post(
   "/login",
   [
-    body("email").isEmail().withMessage("Please enter a valid e-mail."),
+    body("email")
+      .isEmail()
+      .withMessage("Please enter a valid e-mail.")
+      .normalizeEmail(), //normalize email will sanitize the email by making sure that all characters are small case and trim white spaces
     body(
       "password",
       "Password must be at lease 6 characters long and use alpha numeric characters."
     )
       .isLength({ min: 6 })
-      .isAlphanumeric(),
+      .isAlphanumeric()
+      .trim(), // this function sanitize the password
   ],
   authController.postLogin
 );
@@ -33,6 +37,7 @@ router.post(
     check("email")
       .isEmail()
       .withMessage("Please enter a valid e-mail.")
+      .normalizeEmail()
       .custom((value, { req }) => {
         // The custom validator returns true if the promiss resolves successfully.
         // If not, it will return false.
@@ -51,13 +56,16 @@ router.post(
       "Please enter a password with only numbers and text and at lease 6 characters."
     )
       .isLength({ min: 6 })
-      .isAlphanumeric(),
-    body("confirmPassword").custom((value, { req }) => {
-      if (value !== req.body.password) {
-        throw new Error("Passwords have to match");
-      }
-      return true;
-    }),
+      .isAlphanumeric()
+      .trim(),
+    body("confirmPassword")
+      .trim()
+      .custom((value, { req }) => {
+        if (value !== req.body.password) {
+          throw new Error("Passwords have to match");
+        }
+        return true;
+      }),
   ],
   authController.postSignup
 );
