@@ -26,7 +26,6 @@ exports.getLogin = (req, res, next) => {
   return res.render("auth/login", {
     pageTitle: "Login",
     path: "/login",
-
     errorMessage: message,
   });
 };
@@ -110,6 +109,7 @@ exports.getSignup = (req, res, next) => {
       password: "",
       confirmPassword: "",
     },
+    validationErrors: [],
   });
 };
 
@@ -130,6 +130,7 @@ exports.postSignup = (req, res, next) => {
         password: password,
         confirmPassword: req.body.confirmPassword,
       },
+      validationErrors: errors.array(),
     });
   }
 
