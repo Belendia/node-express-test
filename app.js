@@ -99,14 +99,15 @@ app.use((req, res, next) => {
 
   User.findById(req.session.user._id.toString())
     .then((user) => {
+      if (!user) {
+        return next();
+      }
       req.user = user;
-      next();
+      next(); //Allows the request to continue to the next middleware in line
     })
     .catch((err) => {
-      console.log(err);
-      next();
+      throw new Error(err);
     });
-  //Allows the request to continue to the next middleware in line
 });
 
 // Add the csrf token and the variable that tells node.js that the user is logged in to every view.
