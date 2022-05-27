@@ -40,7 +40,10 @@ exports.postAddProduct = (req, res) => {
       console.log("Created the product successfully!");
       res.redirect("/admin/products");
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.log(err);
+      res.redirect("/500");
+    });
 };
 
 exports.getAddProduct = (req, res, next) => {
@@ -142,7 +145,10 @@ exports.postEditProduct = (req, res) => {
         res.redirect("/admin/products");
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.log(err);
+      res.redirect("/500");
+    });
 };
 
 exports.postDeleteProduct = (req, res, next) => {

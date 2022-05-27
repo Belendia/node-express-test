@@ -124,6 +124,8 @@ app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
 
+app.get("/500", errorController.get500);
+
 //catch all middleware for 404
 app.use(errorController.get404);
 
