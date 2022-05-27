@@ -92,7 +92,17 @@ app.use((req, res, next) => {
   next(); //Allows the request to continue to the next middleware in line
 });
 
+// Add the csrf token and the variable that tells node.js that the user is logged in to every view.
 app.use((req, res, next) => {
+  // locals - is passed to every view in node.js
+  // so this variables will be set for ever view that is rendered.
+  res.locals.isAuthenticated = req.session.isLoggedIn === true;
+  res.locals.csrfToken = req.csrfToken();
+  next();
+});
+
+app.use((req, res, next) => {
+  // throw new Error("error"); // Just to test the global error handling is working
   if (!req.session.user) {
     return next();
   }
@@ -106,17 +116,12 @@ app.use((req, res, next) => {
       next(); //Allows the request to continue to the next middleware in line
     })
     .catch((err) => {
-      throw new Error(err);
+      // Throwing an error inside of a promiss will not make express reach to the global error handler.
+      // Therefore we should use next(new Error(err)) instead. But if we through the error in the synchronous
+      // code like on line 105, it will reach the global error handler.
+      // throw new Error(err);
+      next(new Error(err));
     });
-});
-
-// Add the csrf token and the variable that tells node.js that the user is logged in to every view.
-app.use((req, res, next) => {
-  // locals - is passed to every view in node.js
-  // so this variables will be set for ever view that is rendered.
-  res.locals.isAuthenticated = req.session.isLoggedIn === true;
-  res.locals.csrfToken = req.csrfToken();
-  next();
 });
 
 // the route can also be registed as a middleware
@@ -124,10 +129,28 @@ app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
 
-app.get("/500", errorController.get500);
+// Commented because of the reason written in line 144
+// app.get("/500", errorController.get500);
 
 //catch all middleware for 404
 app.use(errorController.get404);
+
+// Error-handling middleware. The above catch all middleware will make sure that express not to reach here.
+// But if you call next(error) with error, then all middlewares will be sikped and this middleware will be
+// triggered.
+// If you got more than one error-handling middleware, they'll execute from top to bottom. Just like the
+// "normal" middleware.
+app.use((error, req, res, next) => {
+  // This will lead to infinite loop if there is an error in modifying the request like the code in
+  // line 105 (featching the current user in line)
+  // res.redirect("/500");
+
+  res.status(500).render("500", {
+    pageTitle: "Page Not Found",
+    path: "/500",
+    isAuthenticated: req.session.isLoggedIn,
+  });
+});
 
 mongoose
   .connect(MONGO_DB_URI)
