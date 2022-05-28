@@ -11,6 +11,8 @@ const csrf = require("csurf");
 const flash = require("connect-flash");
 // read .env file and make the entries available in process.env global variables.
 require("dotenv").config();
+// used for multipart/form-data for file uploading
+const multer = require("multer");
 
 // const { engine } = require("express-handlebars");
 
@@ -28,6 +30,34 @@ const app = express();
 
 // By default the csrf token is stored in the session. You can override that to store the token in the cookie instead.
 const csrfProtection = csrf();
+
+// to configure multer will store the file user uploaded
+const fileStorage = multer.diskStorage({
+  destination: (req, file, callback) => {
+    // passing null to multer tell that we are file to store the file
+    // set the directory in which the file should be stored.
+    callback(null, "images");
+  },
+  filename: (req, file, callback) => {
+    // rename our file.
+    callback(null, new Date().toISOString() + "_" + file.originalname);
+  },
+});
+
+// File filter to filter only a specific file types like .png
+const fileFilter = (req, file, callback) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg"
+  ) {
+    //pass true to the second param if we want to store the file
+    callback(null, true);
+  } else {
+    // and pass false to reject the file storage
+    callback(null, false);
+  }
+};
 
 // Tell express that we want to use handlebars as a templating engine
 // The first param can be named anything.
@@ -60,6 +90,13 @@ app.set("views", "views");
 
 //middlewares
 app.use(bodyParser.urlencoded({ extended: false }));
+// We are expecting to get one file that is why we used single() function.
+// Besides, the name of the file picker in the edit-product.ejs is "image" i.e. <input type"file" name="image" ...
+// dest - is the destination folder. multer({dest: "images"})
+
+app.use(
+  multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
+);
 app.use(bodyParser.json());
 
 // Configuration for the mongo db store used to save
@@ -86,6 +123,7 @@ app.use(csrfProtection);
 app.use(flash());
 
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use((req, res, next) => {
   console.log("In the middleware");
