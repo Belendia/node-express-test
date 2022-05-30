@@ -194,7 +194,7 @@ dist
 
 # End of https://www.toptal.com/developers/gitignore/api/node,macos,visualstudiocode
 
-data/*
+data/invoices/*.pdf
 
 # uploaded images
 images/

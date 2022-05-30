@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const PDFDocument = require("pdfkit");
 
 const Product = require("../models/product");
 const Order = require("../models/order");
@@ -181,15 +182,43 @@ exports.getInvoice = (req, res, next) => {
       //   res.send(data);
       // });
 
-      // The best solution is to stream the data instead of reading the entire data to memory.
-      const file = fs.createReadStream(invoicePath);
+      // The best and recommended solution is to stream the data instead of reading the entire data to memory.
+      // const file = fs.createReadStream(invoicePath);
+      // res.setHeader("Content-Type", "application/pdf");
+      // res.setHeader(
+      //   "Content-Disposition",
+      //   'inline; filename="' + invoiceName + '"'
+      // ); // make the browser open the file inline
+
+      // file.pipe(res);
+
       res.setHeader("Content-Type", "application/pdf");
       res.setHeader(
         "Content-Disposition",
         'inline; filename="' + invoiceName + '"'
       ); // make the browser open the file inline
+      const pdfDoc = new PDFDocument();
+      pdfDoc.pipe(fs.createWriteStream(invoicePath));
+      pdfDoc.pipe(res);
+      pdfDoc.fontSize(26).text("Invoice", {
+        underline: true,
+      });
+      let totalPrice = 0;
+      pdfDoc.fontSize(14).text("------------------");
+      order.products.forEach((prod) => {
+        totalPrice += prod.quantity * prod.product.price;
+        pdfDoc.text(
+          prod.product.title +
+            " - " +
+            prod.quantity +
+            " x $" +
+            prod.product.price
+        );
+      });
+      pdfDoc.text("-----");
+      pdfDoc.fontSize(18).text("Total Price: $" + totalPrice);
 
-      file.pipe(res);
+      pdfDoc.end(); //Done writing the PDF
     })
     .catch((err) => next(err));
 };
