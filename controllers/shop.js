@@ -165,19 +165,31 @@ exports.getInvoice = (req, res, next) => {
       const invoiceName = "invoice-" + orderId + ".pdf";
       const invoicePath = path.join("data", "invoices", invoiceName);
 
-      fs.readFile(invoicePath, (err, data) => {
-        if (err) {
-          return next(err); // the default error handling function takeover.
-        }
+      // This technique will preload the entire file into memory before sending it to users.
+      // This technique is problematic if the file size is too large.
+      // fs.readFile(invoicePath, (err, data) => {
+      //   if (err) {
+      //     return next(err); // the default error handling function takeover.
+      //   }
 
-        res.setHeader("Content-Type", "application/pdf");
-        res.setHeader(
-          "Content-Disposition",
-          'inline; filename="' + invoiceName + '"'
-        ); // make the browser open the file inline
+      //   res.setHeader("Content-Type", "application/pdf");
+      //   res.setHeader(
+      //     "Content-Disposition",
+      //     'inline; filename="' + invoiceName + '"'
+      //   ); // make the browser open the file inline
 
-        res.send(data);
-      });
+      //   res.send(data);
+      // });
+
+      // The best solution is to stream the data instead of reading the entire data to memory.
+      const file = fs.createReadStream(invoicePath);
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        'inline; filename="' + invoiceName + '"'
+      ); // make the browser open the file inline
+
+      file.pipe(res);
     })
     .catch((err) => next(err));
 };
