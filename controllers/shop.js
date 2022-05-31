@@ -23,8 +23,11 @@ exports.getProducts = (req, res) => {
 };
 
 exports.getIndex = (req, res, next) => {
-  // res.sendFile(path.join(rootDir, "views", "add-product.html"));
+  const page = req.query.page;
+  const ITEMS_PER_PAGE = process.env.ITEMS_PER_PAGE || 2;
   Product.find()
+    .skip((page - 1) * ITEMS_PER_PAGE)
+    .limit(ITEMS_PER_PAGE)
     .then((products) => {
       res.render("shop/index", {
         prods: products,
