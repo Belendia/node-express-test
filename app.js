@@ -182,7 +182,7 @@ app.use((error, req, res, next) => {
   // This will lead to infinite loop if there is an error in modifying the request like the code in
   // line 105 (featching the current user in line)
   // res.redirect("/500");
-
+  console.log(error);
   res.status(500).render("500", {
     pageTitle: "Page Not Found",
     path: "/500",
