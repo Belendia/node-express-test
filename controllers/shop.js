@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const PDFDocument = require("pdfkit");
+const stripe = require("stripe")(process.env.SECRET_STRIPE_KEY);
 
 const Product = require("../models/product");
 const Order = require("../models/order");
@@ -152,7 +153,7 @@ exports.getOrders = (req, res, next) => {
     });
 };
 
-exports.postOrders = (req, res, next) => {
+exports.getCheckoutSuccess = (req, res, next) => {
   req.user
     .populate("cart.items.product")
     .then((user) => {
@@ -258,21 +259,42 @@ exports.getInvoice = (req, res, next) => {
 };
 
 exports.getCheckout = (req, res, next) => {
+  let products;
+  let total = 0;
+
   req.user
     .populate("cart.items.product")
     .then((user) => {
-      const products = user.cart.items;
+      products = user.cart.items;
+      total = 0;
 
-      let total = 0;
       products.forEach((p) => {
         total += p.quantity * p.product.price;
       });
 
+      return stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: products.map((p) => {
+          return {
+            name: p.product.title,
+            description: p.product.description,
+            amount: p.product.price * 100, // described in cents
+            currency: "usd",
+            quantity: p.quantity,
+          };
+        }),
+        success_url:
+          req.protocol + "://" + req.get("host") + "/checkout/success", // e.g. http://localhost:3000/checkout/success
+        cancel_url: req.protocol + "://" + req.get("host") + "/checkout/cancel", // e.g. http://localhost:3000/checkout/cancel
+      });
+    })
+    .then((session) => {
       res.render("shop/checkout", {
         pageTitle: "Checkout",
         path: "/checkout",
         products: products,
         totalSum: total,
+        sessionId: session.id,
       });
     })
     .catch((err) => {
