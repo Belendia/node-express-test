@@ -88,15 +88,21 @@ app.set("view engine", "ejs");
  **/
 app.set("views", "views");
 
-//middlewares
+// Middlewares
+
+// This is used to encode data sent from browser in x-www-form-urlencoded.
+// which means used to encode data sent through <form ... tag
 app.use(bodyParser.urlencoded({ extended: false }));
+
+// Multer is used to decode form data sent in multipart/form-data format which is mainly used to upload files.
 // We are expecting to get one file that is why we used single() function.
 // Besides, the name of the file picker in the edit-product.ejs is "image" i.e. <input type"file" name="image" ...
 // dest - is the destination folder. multer({dest: "images"})
-
 app.use(
   multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
 );
+
+// This is used to decode data sent using application/json which is usually used in REST endpoints
 app.use(bodyParser.json());
 
 // Configuration for the mongo db store used to save
