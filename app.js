@@ -1,4 +1,5 @@
 const path = require("path");
+const fs = require("fs");
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -20,6 +21,9 @@ const helmet = require("helmet");
 // compress assets like css and js files
 const compression = require("compression");
 
+// logging
+const morgan = require("morgan");
+
 // const { engine } = require("express-handlebars");
 
 const adminRoutes = require("./routes/admin");
@@ -39,6 +43,13 @@ app.use(helmet());
 
 // Compress assets
 app.use(compression());
+
+// Logging
+const accessLogStream = fs.createWriteStream(
+  path.join(__dirname, "access.log"),
+  { flags: "a" } // append in the file
+);
+app.use(morgan("combined", { stream: accessLogStream }));
 
 // By default the csrf token is stored in the session. You can override that to store the token in the cookie instead.
 const csrfProtection = csrf();
