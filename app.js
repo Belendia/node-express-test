@@ -14,6 +14,9 @@ require("dotenv").config();
 // used for multipart/form-data for file uploading
 const multer = require("multer");
 
+// Secure response headers with helmet
+const helmet = require("helmet");
+
 // const { engine } = require("express-handlebars");
 
 const adminRoutes = require("./routes/admin");
@@ -27,6 +30,9 @@ const errorController = require("./controllers/error");
 const MONGO_DB_URI = "mongodb://localhost:27017/shopping";
 
 const app = express();
+
+// Setting secure response headers with helmet
+app.use(helmet());
 
 // By default the csrf token is stored in the session. You can override that to store the token in the cookie instead.
 const csrfProtection = csrf();
