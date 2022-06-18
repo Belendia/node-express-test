@@ -17,6 +17,9 @@ const multer = require("multer");
 // Secure response headers with helmet
 const helmet = require("helmet");
 
+// compress assets like css and js files
+const compression = require("compression");
+
 // const { engine } = require("express-handlebars");
 
 const adminRoutes = require("./routes/admin");
@@ -33,6 +36,9 @@ const app = express();
 
 // Setting secure response headers with helmet
 app.use(helmet());
+
+// Compress assets
+app.use(compression());
 
 // By default the csrf token is stored in the session. You can override that to store the token in the cookie instead.
 const csrfProtection = csrf();
